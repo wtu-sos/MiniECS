@@ -12,25 +12,25 @@ namespace ECS
         public DataArray(int index, int Cap = 10)
         {
             _inner = new T[Cap];
-            Capcity = Cap;
+            _capacity = Cap;
             Index = index;
         }
 
         public int Index;
         private T[] _inner = null;
-        private int Capcity = 0;
-        private int Size = 0;
+        private readonly int _capacity = 0;
+        private int _size = 0;
 
         public int Add(T t)
         {
-            if (Size == Capcity)
+            if (_size == _capacity)
             {
                 return -1;
             }
 
-            var index = Size;
+            var index = _size;
             _inner[index] = t;
-            Size += 1;
+            _size += 1;
             return index;
         }
 
@@ -41,17 +41,17 @@ namespace ECS
                 return false;
             }
 
-            if (index >= Size)
+            if (index >= _size)
             {
                 return false;
             }
 
-            var last = Size - 1;
+            var last = _size - 1;
             if (index != last)
             {
                 _inner[index] = _inner[last];
             }
-            Size -= 1;
+            _size -= 1;
             
             return true;
         }
@@ -61,7 +61,7 @@ namespace ECS
             int idx = 0;
             foreach (var t in _inner)
             {
-                if (idx >= Size)
+                if (idx >= _size)
                 {
                     yield break;
                 }
@@ -74,7 +74,7 @@ namespace ECS
         public string ArrayInfo()
         {
             var sb = new StringBuilder();
-            for (int i = 0; i < Size; i++)
+            for (int i = 0; i < _size; i++)
             {
                 sb.Append($"{JsonSerializer.Serialize(_inner[i])},");
             }
@@ -86,19 +86,19 @@ namespace ECS
     {
         private ArchType _type;
         private List<DataArray<T>> _store = new List<DataArray<T>>();
-        private const int segment_size = 20;
-        private int current_segment_index = 0;
+        private const int SegmentSize = 20;
+        private int _currentSegmentIndex = 0;
 
-        private List<DataArray<T>> _free_array = new List<DataArray<T>>();
+        private List<DataArray<T>> _freeArray = new List<DataArray<T>>();
 
         public (int, int) Add(T t)
         {
-            if (_free_array.Count == 0)
+            if (_freeArray.Count == 0)
             {
                 NewArray();
             }
 
-            var ar = _free_array[0];
+            var ar = _freeArray[0];
             var ar_idx = ar.Add(t);
             if (ar_idx < 0)
             {
@@ -131,10 +131,10 @@ namespace ECS
 
         private void NewArray()
         {
-            var na = new DataArray<T>(current_segment_index, segment_size);
-            ++current_segment_index;
+            var na = new DataArray<T>(_currentSegmentIndex, SegmentSize);
+            ++_currentSegmentIndex;
             _store.Add(na);
-            _free_array.Add(na);
+            _freeArray.Add(na);
         }
 
         public string DebugInfo()
