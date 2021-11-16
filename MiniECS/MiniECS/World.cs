@@ -5,6 +5,7 @@ namespace ECS
     public class World
     {
         private Dictionary<System.Type, object> _everything = new();
+        private ArchTypeStorage arches;
 
         public IEnumerable<T> View<T >(ArchType t) where T: struct
         {
