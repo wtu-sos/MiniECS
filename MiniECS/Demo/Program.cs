@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using ECS;
 
-namespace ECS
+namespace Demo
 {
-    class Program
+    internal class Program
     {
         static void print()
         {

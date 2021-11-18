@@ -1,0 +1,16 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "69521a90-fab0-4c72-9c9f-179360590fe3": {
+      "ProjectGuid": "69521a90-fab0-4c72-9c9f-179360590fe3",
+      "DisplayName": "Runner",
+      "ColorIndex": 0
+    },
+    "7e8067c8-5fd7-44a2-abe6-88f286fa20b3": {
+      "ProjectGuid": "7e8067c8-5fd7-44a2-abe6-88f286fa20b3",
+      "DisplayName": "MiniECS",
+      "ColorIndex": 1
+    }
+  },
+  "NextColorIndex": 2
+}
