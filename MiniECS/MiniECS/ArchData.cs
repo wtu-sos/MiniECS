@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace ECS
 {
-
     public class DataArray<T> where T: struct
     {
         public DataArray(int index, int Cap = 10)
@@ -56,6 +54,16 @@ namespace ECS
             return true;
         }
 
+        public T Get(int index)
+        {
+            if (0 > index || index >= _size)
+            {
+                throw new IndexOutOfRangeException();
+            }
+
+            return _inner[index]; 
+        }
+
         public IEnumerable<T> View()
         {
             int idx = 0;
@@ -69,6 +77,11 @@ namespace ECS
                 ++idx;
                 yield return t;
             }
+        }
+
+        public bool IsFull()
+        {
+            return _size == _capacity;
         }
 
         public string ArrayInfo()
@@ -105,6 +118,11 @@ namespace ECS
                 return (-1, -1);
             }
 
+            if (ar.IsFull())
+            {
+                _freeArray.RemoveAt(0);
+            }
+
             return (ar.Index, ar_idx);
         }
 
@@ -115,7 +133,22 @@ namespace ECS
                 return false;
             }
 
-            return _store[seg].Remove(i);
+            var r = _store[seg].Remove(i);
+            if (r)
+            {
+                _freeArray.Add(_store[seg]);
+            }
+            return r;
+        }
+
+        public T Get(int seg, int i)
+        {
+            if (_store.Count <= seg)
+            {
+                throw new IndexOutOfRangeException("");
+            }
+
+            return _store[seg].Get(i);
         }
 
         public IEnumerable<T> View()

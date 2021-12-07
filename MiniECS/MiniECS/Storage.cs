@@ -21,14 +21,34 @@ namespace ECS
             }
         }
 
-        public bool Remove(ArchType at, int seg, int idx)
+        public bool Remove(EntityKey key)
         {
-            if (_storages.TryGetValue(at, out var storage))
+            if (_storages.TryGetValue(key._type, out var storage))
+            {
+                return storage.Remove(key.segment, key.index);
+            }
+            
+            return true;
+        }
+
+        public bool Remove(ArchType t, int seg, int idx)
+        {
+            if (_storages.TryGetValue(t, out var storage))
             {
                 return storage.Remove(seg, idx);
             }
             
             return true;
+        }
+
+        public T Get(EntityKey key)
+        {
+            if (_storages.TryGetValue(key._type, out var storage))
+            {
+                return storage.Get(key.segment, key.index);
+            }
+
+            throw new System.Exception("miss data");
         }
 
         public IEnumerable<T> View(ArchType t)

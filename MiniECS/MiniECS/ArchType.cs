@@ -52,5 +52,13 @@ namespace ECS
         {
             return _types.Contains(t1) && _types.Contains(t2);
         }
+
+        public ArchType Clone()
+        {
+            var arch = new ArchType();
+            foreach(var t in _types)
+                arch.Add(t);
+            return arch;
+        }
     }
 }

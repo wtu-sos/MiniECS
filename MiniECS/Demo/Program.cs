@@ -33,24 +33,59 @@ namespace Demo
             [JsonInclude]
             public int C;
         }
+
+        public class UpdateDataSystem: ISystem
+        {
+            public void Exec(World world)
+            {
+                var art = new ArchType();
+                art.Add(typeof(Data));
+                art.Add(typeof(Data1));
+
+                world.View<Data>(art).Zip(world.View<Data1>(art), (d1, d2) =>
+                {
+                    d1.A += 1;
+                    d1.B += 2;
+                    d1.C += 3;
+
+                    d2.A += 11;
+                    d2.B += 12;
+                    d2.C += 13;
+                });
+            }
+        }
         
         static void Main(string[] args)
         {
             print();
 
             var world = new World();
+            world.AddSystem(new UpdateDataSystem());
+
             var art = new ArchType();
             art.Add(typeof(Data));
             art.Add(typeof(Data1));
-            
-            world.Add(art, new Data() { A = 1, B = 2, C = 3, });
-            world.Add(art, new Data() { A = 2, B = 3, C = 3, });
-            world.Add(art, new Data1() { A = 3, B = 4, C = 6, });
-            world.Add(art, new Data1() { A = 4, B = 5, C = 6, });
-            world.View<Data>(art).Zip(world.View<Data1>(art), (d1, d2) =>
+
+            var start = new System.Diagnostics.Stopwatch();
+            start.Start();
+            for (int i = 0; i < 2900; i++)
             {
-                Console.WriteLine($"{JsonSerializer.Serialize(d1)}, {JsonSerializer.Serialize(d2)}");
-            });
+                EntityKey key = null;
+                key = world.Add(art, new Data() { A = i+3, B = i+4, C = i+6, });
+                world.Add(key, new Data1() { A = i+4, B = i+5, C = i+6, });
+            }
+            start.Stop();
+            Console.WriteLine($"elasped : {start.ElapsedMilliseconds}");
+
+            int index = 0;
+            while(true)
+            {
+                start.Restart();
+                for (int i = 0; i < 10000; ++i)
+                    world.Exec();
+                start.Stop();
+                Console.WriteLine($" {index++} change data elasped : {start.ElapsedMilliseconds}");
+            }
             
             /*
             var at = new ArchData<Data>();
