@@ -66,16 +66,9 @@ namespace ECS
 
         public IEnumerable<T> View()
         {
-            int idx = 0;
-            foreach (var t in _inner)
+            for (int idx = 0; idx < _size; idx++)
             {
-                if (idx >= _size)
-                {
-                    yield break;
-                }
-
-                ++idx;
-                yield return t;
+                yield return _inner[idx];   
             }
         }
 
@@ -173,7 +166,6 @@ namespace ECS
         public string DebugInfo()
         {
             var sb = new StringBuilder();
-            
             foreach (var array in _store)
             {
                 sb.AppendLine(array.ArrayInfo());

@@ -16,6 +16,11 @@
     
     public class Entity
     {
+        public Entity(EntityKey _key)
+        {
+            key = _key; 
+        }
+
         private EntityKey key;
     }
 }

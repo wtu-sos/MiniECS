@@ -7,6 +7,7 @@ namespace Demo
 {
     internal class Program
     {
+        static ArchType art = new ArchType();
         static void print()
         {
             string v = null;
@@ -34,15 +35,28 @@ namespace Demo
             public int C;
         }
 
+        struct Data2
+        {
+            [JsonInclude]
+            public int A;
+            [JsonInclude]
+            public int B;
+            [JsonInclude]
+            public int C;
+        }
+
+        public class DebugSystem: ISystem
+        {
+            public void Exec(World world)
+            {
+                world.DebugInfo();
+            }
+        }
         public class UpdateDataSystem: ISystem
         {
             public void Exec(World world)
             {
-                var art = new ArchType();
-                art.Add(typeof(Data));
-                art.Add(typeof(Data1));
-
-                world.View<Data>(art).Zip(world.View<Data1>(art), (d1, d2) =>
+                world.View<Data>(art).Zip(world.View<Data1>(art), world.View<Data2>(art), (d1, d2, d3) =>
                 {
                     d1.A += 1;
                     d1.B += 2;
@@ -51,6 +65,10 @@ namespace Demo
                     d2.A += 11;
                     d2.B += 12;
                     d2.C += 13;
+
+                    d3.A += 21;
+                    d3.B += 22;
+                    d3.C += 23;
                 });
             }
         }
@@ -62,17 +80,19 @@ namespace Demo
             var world = new World();
             world.AddSystem(new UpdateDataSystem());
 
-            var art = new ArchType();
             art.Add(typeof(Data));
             art.Add(typeof(Data1));
+            art.Add(typeof(Data2));
 
             var start = new System.Diagnostics.Stopwatch();
             start.Start();
             for (int i = 0; i < 2900; i++)
             {
-                EntityKey key = null;
-                key = world.Add(art, new Data() { A = i+3, B = i+4, C = i+6, });
-                world.Add(key, new Data1() { A = i+4, B = i+5, C = i+6, });
+                //EntityKey key = null;
+                world.CreateEntity(art);
+                //key = world.Add(art, new Data() { A = i+3, B = i+4, C = i+6, });
+                //world.Add(key, new Data1() { A = i+4, B = i+5, C = i+6, });
+                //world.Add(key, new Data2() { A = i+4, B = i+5, C = i+6, });
             }
             start.Stop();
             Console.WriteLine($"elasped : {start.ElapsedMilliseconds}");
@@ -85,21 +105,15 @@ namespace Demo
                     world.Exec();
                 start.Stop();
                 Console.WriteLine($" {index++} change data elasped : {start.ElapsedMilliseconds}");
+                if (index > 1)
+                {
+                    break;
+                }
             }
             
-            /*
-            var at = new ArchData<Data>();
-            at.Add(new Data() { A = 1, B = 2, C = 3, });
-            at.Add(new Data() { A = 2, B = 4, C = 3, });
-            at.Add(new Data() { A = 3, B = 6, C = 3, });
-            at.Remove(0, 1);
-            at.Add(new Data() { A = 2, B = 4, C = 3, });
-            at.Remove(0, 1);
-            at.Add(new Data() { A = 3, B = 6, C = 3, });
-            
-            Console.WriteLine(at.DebugInfo());
-            */
-            
+            world.AddSystem(new DebugSystem());
+            world.Exec();
+
             Console.WriteLine("Hello World!");
         }
     }

@@ -43,6 +43,11 @@ namespace ECS
             _types.Add(t);
         }
 
+        public HashSet<Type> Get()
+        {
+            return _types;
+        }
+
         public bool match(Type t)
         {
             return _types.Contains(t);

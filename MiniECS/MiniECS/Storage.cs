@@ -61,5 +61,15 @@ namespace ECS
                 }
             }
         }
+
+        public void DebugInfo()
+        {
+            System.Console.WriteLine($"{ _storages.ToString()}  => {_storages.Count}");
+            foreach(var s in _storages)
+            {
+                string info = s.Value.DebugInfo();
+                System.Console.WriteLine(info);
+            }
+        }
     }
 }
