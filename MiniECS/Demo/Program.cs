@@ -55,10 +55,6 @@ namespace Demo
         {
             public void Exec(World world)
             {
-                world.ViewReset<Data1>(art);
-                world.ViewReset<Data2>(art);
-                world.ViewReset<Data>(art);
-
                 var r = world.Zip(art, (ref Data d1, ref Data1 d2, ref Data2 d3) =>
                 {
                     d1.A += 1;

@@ -173,7 +173,10 @@ namespace ECS
             where T3 : struct
         {
 
-            int count = 0;
+            ViewReset<T1>(t);
+            ViewReset<T2>(t);
+            ViewReset<T3>(t);
+
             while (true)
             {
                 //T1 t1 = ViewRef<T1>(t, out bool r1);
@@ -181,9 +184,7 @@ namespace ECS
                 //T3 t3 = ViewRef<T3>(t, out bool r3);
                 //if (r1 && r2 && r3) 
                 //{
-                    ++count;
                     action(ref ViewRef<T1>(t, out bool r1), ref ViewRef<T2>(t, out bool r2), ref ViewRef<T3>(t, out bool r3));
-
                     yield return r1 && r2 && r3;
                 //}
 
