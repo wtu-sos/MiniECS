@@ -60,6 +60,16 @@ namespace ECS
             }
         }
 
+        public ArchData<T> GetStorage(ArchType t)
+        {
+            if (_storages.TryGetValue(t, out var storage))
+            {
+                return storage;
+            }
+
+            return null;
+        }
+
         public ref T ViewRef(ArchType t, out bool o)
         {
             o = false;

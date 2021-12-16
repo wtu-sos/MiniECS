@@ -38,7 +38,7 @@ namespace ECS
             }
         }
 
-        public ref T ViewRef<T>(ArchType t, out bool o) where T: struct
+        private ref T ViewRef<T>(ArchType t, out bool o) where T: struct
         {
             o = false;
             if (_everything.TryGetValue(typeof(T), out var store))
@@ -51,6 +51,15 @@ namespace ECS
             }
 
             throw new InvalidOperationException("");
+        }
+
+        private ArchData<T> GetStorage<T>(ArchType t) where T : struct
+        {
+            if (_everything.TryGetValue(typeof(T), out var store))
+            {
+                return ((Storage<T>)store).GetStorage(t);
+            }
+            return null;
         }
 
         public IEnumerable<T> View<T>(ArchType t) where T: struct
@@ -176,6 +185,14 @@ namespace ECS
             ViewReset<T1>(t);
             ViewReset<T2>(t);
             ViewReset<T3>(t);
+            var s1 = GetStorage<T1>(t);
+            var s2 = GetStorage<T2>(t);
+            var s3 = GetStorage<T3>(t);
+
+            if (null == s1 || null == s2 || null == s3)
+            {
+                yield return false;
+            }
 
             while (true)
             {
@@ -184,7 +201,7 @@ namespace ECS
                 //T3 t3 = ViewRef<T3>(t, out bool r3);
                 //if (r1 && r2 && r3) 
                 //{
-                    action(ref ViewRef<T1>(t, out bool r1), ref ViewRef<T2>(t, out bool r2), ref ViewRef<T3>(t, out bool r3));
+                    action(ref s1.ViewRef(out bool r1), ref s2.ViewRef(out bool r2), ref s3.ViewRef(out bool r3));
                     yield return r1 && r2 && r3;
                 //}
 

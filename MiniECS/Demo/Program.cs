@@ -112,7 +112,7 @@ namespace Demo
                     world.Exec();
                 start.Stop();
                 Console.WriteLine($" {index++} change data elasped : {start.ElapsedMilliseconds}");
-                if (index > 1)
+                if (index > 100)
                 {
                     break;
                 }
