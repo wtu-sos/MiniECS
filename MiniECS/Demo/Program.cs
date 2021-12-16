@@ -44,7 +44,6 @@ namespace Demo
             [JsonInclude]
             public int C;
         }
-
         public class DebugSystem: ISystem
         {
             public void Exec(World world)
@@ -56,7 +55,11 @@ namespace Demo
         {
             public void Exec(World world)
             {
-                world.View<Data>(art).Zip(world.View<Data1>(art), world.View<Data2>(art), (d1, d2, d3) =>
+                world.ViewReset<Data1>(art);
+                world.ViewReset<Data2>(art);
+                world.ViewReset<Data>(art);
+
+                var r = world.Zip(art, (ref Data d1, ref Data1 d2, ref Data2 d3) =>
                 {
                     d1.A += 1;
                     d1.B += 2;
@@ -70,6 +73,14 @@ namespace Demo
                     d3.B += 22;
                     d3.C += 23;
                 });
+
+                foreach (var d in r)
+                {
+                    if (!d)
+                    {
+                        break;
+                    }
+                }
             }
         }
         

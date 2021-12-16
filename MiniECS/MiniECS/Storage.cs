@@ -5,6 +5,7 @@ namespace ECS
     public class Storage<T> where T: struct
     {
         private Dictionary<ArchType, ArchData<T>> _storages = new();
+        private T DefaultData = new T();
 
         public (int, int) Add(ArchType at, T t)
         {
@@ -41,14 +42,32 @@ namespace ECS
             return true;
         }
 
-        public T Get(EntityKey key)
+        public ref T Get(EntityKey key)
         {
             if (_storages.TryGetValue(key._type, out var storage))
             {
-                return storage.Get(key.segment, key.index);
+                return ref storage.Get(key.segment, key.index);
             }
 
             throw new System.Exception("miss data");
+        }
+
+        public void ViewReset(ArchType t)
+        {
+            if (_storages.TryGetValue(t, out var storage))
+            {
+                storage.ViewReset();
+            }
+        }
+
+        public ref T ViewRef(ArchType t, out bool o)
+        {
+            o = false;
+            if (_storages.TryGetValue(t, out var storage))
+            {
+                return ref storage.ViewRef(out o);
+            }
+            return ref DefaultData;
         }
 
         public IEnumerable<T> View(ArchType t)

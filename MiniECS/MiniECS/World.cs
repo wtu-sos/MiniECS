@@ -15,6 +15,7 @@ namespace ECS
         public ArchTypeStorage Arches { get => arches; set => arches = value; }
 
         private List<ISystem> systems = new List<ISystem>();
+        private Dictionary<System.Type, object> _defaultData = new();
 
         public void AddSystem(ISystem sys)
         {
@@ -27,6 +28,29 @@ namespace ECS
             {
                 system.Exec(this);
             }
+        }
+
+        public void ViewReset<T>(ArchType t) where T: struct
+        {
+            if (_everything.TryGetValue(typeof(T), out var store))
+            {
+                ((Storage<T>)store).ViewReset(t);
+            }
+        }
+
+        public ref T ViewRef<T>(ArchType t, out bool o) where T: struct
+        {
+            o = false;
+            if (_everything.TryGetValue(typeof(T), out var store))
+            {
+                return ref ((Storage<T>)store).ViewRef(t, out o);
+            }
+            if (!_defaultData.TryGetValue(typeof(T), out var d))
+            {
+                d = new T();
+            }
+
+            throw new InvalidOperationException("");
         }
 
         public IEnumerable<T> View<T>(ArchType t) where T: struct
@@ -139,6 +163,34 @@ namespace ECS
         public bool MoveEntity(Entity entity, ArchType t)
         {
             return false;
+        }
+
+        public delegate void ActionRef<T1, T2, T3>(ref T1 item1, ref T2 item2, ref T3 item3);
+
+        public IEnumerable<bool> Zip<T1, T2, T3>(ArchType t, ActionRef<T1, T2, T3> action) 
+            where T1 : struct
+            where T2 : struct
+            where T3 : struct
+        {
+
+            int count = 0;
+            while (true)
+            {
+                //T1 t1 = ViewRef<T1>(t, out bool r1);
+                //T2 t2 = ViewRef<T2>(t, out bool r2);
+                //T3 t3 = ViewRef<T3>(t, out bool r3);
+                //if (r1 && r2 && r3) 
+                //{
+                    ++count;
+                    action(ref ViewRef<T1>(t, out bool r1), ref ViewRef<T2>(t, out bool r2), ref ViewRef<T3>(t, out bool r3));
+
+                    yield return r1 && r2 && r3;
+                //}
+
+                //break;
+            }
+
+            yield return false;
         }
     }
 }

@@ -54,14 +54,14 @@ namespace ECS
             return true;
         }
 
-        public T Get(int index)
+        public ref T Get(int index)
         {
             if (0 > index || index >= _size)
             {
                 throw new IndexOutOfRangeException();
             }
 
-            return _inner[index]; 
+            return ref _inner[index]; 
         }
 
         public IEnumerable<T> View()
@@ -94,8 +94,23 @@ namespace ECS
         private List<DataArray<T>> _store = new List<DataArray<T>>();
         private const int SegmentSize = 20;
         private int _currentSegmentIndex = 0;
+        private T defautData = new T();
 
         private List<DataArray<T>> _freeArray = new List<DataArray<T>>();
+
+        private class Cursor
+        {
+            public Cursor() { }
+            public void Clear() {
+                Seg = 0;
+                Idx = -1;
+            }
+
+            public int Seg = 0;
+            public int Idx = -1;
+        }
+
+        private Cursor _cursor = new();
 
         public (int, int) Add(T t)
         {
@@ -134,14 +149,48 @@ namespace ECS
             return r;
         }
 
-        public T Get(int seg, int i)
+        public ref T Get(int seg, int i, out bool o)
         {
             if (_store.Count <= seg)
             {
                 throw new IndexOutOfRangeException("");
             }
 
-            return _store[seg].Get(i);
+            o = true;
+            return ref _store[seg].Get(i);
+        }
+
+        public ref T Get(int seg, int i)
+        {
+            if (_store.Count <= seg)
+            {
+                throw new IndexOutOfRangeException("");
+            }
+
+            return ref _store[seg].Get(i);
+        }
+
+        public ArchData<T> ViewReset()
+        {
+            _cursor.Clear();
+            return this;
+        }
+
+        public ref T ViewRef(out bool o)
+        {
+            ++_cursor.Idx;
+            if (_cursor.Idx >= SegmentSize)
+            {
+                _cursor.Idx = 0;
+                ++_cursor.Seg;
+            }
+            if (_cursor.Seg >= _store.Count)
+            {
+                o = false;
+                return ref defautData;
+            }
+
+            return ref Get(_cursor.Seg, _cursor.Idx, out o);
         }
 
         public IEnumerable<T> View()
