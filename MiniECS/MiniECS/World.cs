@@ -8,7 +8,7 @@ namespace ECS
         public void Exec(World world);
     }
 
-    public class World
+    public partial class World
     {
         private Dictionary<System.Type, object> _everything = new();
         private ArchTypeStorage arches = new ArchTypeStorage();
@@ -174,41 +174,5 @@ namespace ECS
             return false;
         }
 
-        public delegate void ActionRef<T1, T2, T3>(ref T1 item1, ref T2 item2, ref T3 item3);
-
-        public IEnumerable<bool> Zip<T1, T2, T3>(ArchType t, ActionRef<T1, T2, T3> action) 
-            where T1 : struct
-            where T2 : struct
-            where T3 : struct
-        {
-
-            ViewReset<T1>(t);
-            ViewReset<T2>(t);
-            ViewReset<T3>(t);
-            var s1 = GetStorage<T1>(t);
-            var s2 = GetStorage<T2>(t);
-            var s3 = GetStorage<T3>(t);
-
-            if (null == s1 || null == s2 || null == s3)
-            {
-                yield return false;
-            }
-
-            while (true)
-            {
-                //T1 t1 = ViewRef<T1>(t, out bool r1);
-                //T2 t2 = ViewRef<T2>(t, out bool r2);
-                //T3 t3 = ViewRef<T3>(t, out bool r3);
-                //if (r1 && r2 && r3) 
-                //{
-                    action(ref s1.ViewRef(out bool r1), ref s2.ViewRef(out bool r2), ref s3.ViewRef(out bool r3));
-                    yield return r1 && r2 && r3;
-                //}
-
-                //break;
-            }
-
-            yield return false;
-        }
     }
 }

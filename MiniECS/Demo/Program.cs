@@ -95,11 +95,7 @@ namespace Demo
             start.Start();
             for (int i = 0; i < 2900; i++)
             {
-                //EntityKey key = null;
                 world.CreateEntity(art);
-                //key = world.Add(art, new Data() { A = i+3, B = i+4, C = i+6, });
-                //world.Add(key, new Data1() { A = i+4, B = i+5, C = i+6, });
-                //world.Add(key, new Data2() { A = i+4, B = i+5, C = i+6, });
             }
             start.Stop();
             Console.WriteLine($"elasped : {start.ElapsedMilliseconds}");
@@ -112,7 +108,7 @@ namespace Demo
                     world.Exec();
                 start.Stop();
                 Console.WriteLine($" {index++} change data elasped : {start.ElapsedMilliseconds}");
-                if (index > 100)
+                if (index > 10)
                 {
                     break;
                 }
