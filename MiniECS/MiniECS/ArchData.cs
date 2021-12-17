@@ -18,6 +18,13 @@ namespace ECS
         private T[] _inner = null;
         private readonly int _capacity = 0;
         private int _size = 0;
+        private T defaultData = new T(); 
+
+
+        public bool HasValue(int idx)
+        {
+            return idx < _size;
+        }
 
         public int Add(T t)
         {
@@ -64,6 +71,19 @@ namespace ECS
             return ref _inner[index]; 
         }
 
+        public ref T Get(int index, out bool o)
+        {
+            if (0 > index || index >= _size)
+            {
+                //throw new IndexOutOfRangeException();
+                o = false;
+                return ref defaultData;
+            }
+
+            o = true;
+            return ref _inner[index]; 
+        }
+
         public IEnumerable<T> View()
         {
             for (int idx = 0; idx < _size; idx++)
@@ -92,7 +112,7 @@ namespace ECS
     {
         private ArchType _type;
         private List<DataArray<T>> _store = new List<DataArray<T>>();
-        private const int SegmentSize = 20;
+        private const int SegmentSize = 40;
         private int _currentSegmentIndex = 0;
         private T defautData = new T();
 
@@ -156,8 +176,8 @@ namespace ECS
                 throw new IndexOutOfRangeException("");
             }
 
-            o = true;
-            return ref _store[seg].Get(i);
+            //o = true;
+            return ref _store[seg].Get(i, out o);
         }
 
         public ref T Get(int seg, int i)
@@ -165,6 +185,11 @@ namespace ECS
             if (_store.Count <= seg)
             {
                 throw new IndexOutOfRangeException("");
+            }
+
+            if (_store[seg].HasValue(i))
+            {
+                return ref defautData;
             }
 
             return ref _store[seg].Get(i);
