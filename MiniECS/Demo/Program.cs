@@ -8,13 +8,6 @@ namespace Demo
     internal class Program
     {
         static ArchType art = new ArchType();
-        static void print()
-        {
-            string v = null;
-            v?.ToLower();
-            Console.WriteLine("print");
-        }
-
         struct Data
         {
             [JsonInclude]
@@ -55,7 +48,7 @@ namespace Demo
         {
             public void Exec(World world)
             {
-                var r = world.Zip(art, (ref Data d1, ref Data1 d2, ref Data2 d3) =>
+                world.Zip(art, (ref Data d1, ref Data1 d2, ref Data2 d3) =>
                 {
                     d1.A += 1;
                     d1.B += 2;
@@ -68,22 +61,12 @@ namespace Demo
                     d3.A += 21;
                     d3.B += 22;
                     d3.C += 23;
-                });
-
-                foreach (var d in r)
-                {
-                    if (!d)
-                    {
-                        break;
-                    }
-                }
+                }).ForEach();
             }
         }
         
         static void Main(string[] args)
         {
-            print();
-
             var world = new World();
             world.AddSystem(new UpdateDataSystem());
 

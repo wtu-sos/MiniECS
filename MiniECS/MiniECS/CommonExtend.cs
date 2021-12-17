@@ -5,6 +5,16 @@ namespace ECS
 {
     public static class CommonExtend
     {
+        public static void ForEach(this IEnumerable<bool> it)
+        {
+            foreach (var item in it)
+            {
+                if (!item)
+                {
+                    break;
+                }
+            }
+        }
         public static void Zip<T1, T2>( this IEnumerable<T1> first, IEnumerable<T2> second, Action<T1, T2> action)
         {
             using (var e1 = first.GetEnumerator())
