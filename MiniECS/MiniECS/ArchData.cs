@@ -187,7 +187,7 @@ namespace ECS
                 throw new IndexOutOfRangeException("");
             }
 
-            if (_store[seg].HasValue(i))
+            if (!_store[seg].HasValue(i))
             {
                 return ref defautData;
             }
