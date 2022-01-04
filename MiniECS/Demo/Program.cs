@@ -1,13 +1,11 @@
-﻿using System;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using ECS;
+using System;
+using System.Text.Json.Serialization;
 
 namespace Demo
 {
     internal class Program
     {
-        static ArchType art = new ArchType();
         struct Data
         {
             [JsonInclude]
@@ -17,7 +15,7 @@ namespace Demo
             [JsonInclude]
             public int C;
         }
-        
+
         struct Data1
         {
             [JsonInclude]
@@ -37,17 +35,18 @@ namespace Demo
             [JsonInclude]
             public int C;
         }
-        public class DebugSystem: ISystem
+        public class DebugSystem : ISystem
         {
             public void Exec(World world)
             {
                 world.DebugInfo();
             }
         }
-        public class UpdateDataSystem: ISystem
+        public class UpdateDataSystem : ISystem
         {
             public void Exec(World world)
             {
+                var art = world.Arches.GetArchType(typeof(Data), typeof(Data1), typeof(Data2));
                 world.Zip(art, (ref Data d1, ref Data1 d2, ref Data2 d3) =>
                 {
                     d1.A += 1;
@@ -64,16 +63,13 @@ namespace Demo
                 }).ForEach();
             }
         }
-        
+
         static void Main(string[] args)
         {
             var world = new World();
             world.AddSystem(new UpdateDataSystem());
 
-            art.Add(typeof(Data));
-            art.Add(typeof(Data1));
-            art.Add(typeof(Data2));
-
+            var art = world.Arches.GetArchType(typeof(Data), typeof(Data1), typeof(Data2));
             var start = new System.Diagnostics.Stopwatch();
             start.Start();
             for (int i = 0; i < 2900; i++)
@@ -84,7 +80,7 @@ namespace Demo
             Console.WriteLine($"elasped : {start.ElapsedMilliseconds}");
 
             int index = 0;
-            while(true)
+            while (true)
             {
                 start.Restart();
                 for (int i = 0; i < 10000; ++i)
@@ -96,7 +92,7 @@ namespace Demo
                     break;
                 }
             }
-            
+
             world.AddSystem(new DebugSystem());
             world.Exec();
 
